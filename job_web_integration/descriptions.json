@@ -1,9 +1,0 @@
-{
-    "careerbuilder": {
-        "fields": "job_title,job_description,job_requirements,address,categories,end_date,update_date,salary,position,other_information,company_name,company_address,company_size" 
-    },
-    "careerlink": {
-        "fields": "job_title,address_locality,address_region,address_country,job_description,skills,education_requirements,experience_requirements,employment_type,categories,sex,end_date,update_date,salary,position,company_name,company_size" 
-    }
-    
-}
