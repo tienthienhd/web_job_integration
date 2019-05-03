@@ -8,7 +8,11 @@ class TimViecNhanhSpider(scrapy.Spider):
     root_url = 'www.timviecnhanh.com'
 
     custom_settings = {
-        'crawl_data.pipelines.JsonWriterPipeline': 300,
+        # 'ITEM_PIPELINES': {
+        #     'web_job.pipelines.MappingPipeline': 100,
+        #     'web_job.pipelines.NormalizeAddressPipeline': 200,
+        #     'web_job.pipelines.NormalizeSalaryPipeline': 300,
+        # },
         'DOWNLOAD_DELAY': 2
     }
 
@@ -36,14 +40,22 @@ class TimViecNhanhSpider(scrapy.Spider):
     def parse(self, response):
         job_title = response.xpath('//header[@class="block-title"]/h1/span/text()').get()
         update_date = response.xpath('//time[@class="entry-date published"]/text()').get()
-        address = response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul[@class="no-style"]/li[4]/a/text()').getall()
+        address = response.xpath(
+            '//div[@class="col-xs-4 offset20 push-right-20"]/ul[@class="no-style"]/li[4]/a/text()').getall()
 
-        company_name = response.xpath('//div[@class="col-xs-6 p-r-10 offset10"]/h3/a/text()').get().strip()
-        company_address = response.xpath('//div[@class="col-xs-6 p-r-10 offset10"]/span/text()').get()[9:]
+        company_name = response.xpath('//div[@class="col-xs-6 p-r-10 offset10"]/h3/a/text()').get()
+        if company_name is not None:
+            company_name = company_name.strip()
+        company_address = response.xpath('//div[@class="col-xs-6 p-r-10 offset10"]/span/text()').get()
+        if company_address is not None:
+            company_address = company_address[9:]
         # company_website = response.xpath('//div[@class="col-xs-6 p-r-10 offset10"]/h3/a/@href').extract()[0]
         # time_update = response.xpath('//div[@class="col-xs-3 offset10"]/time/text()').extract()[0].strip()
-        salary = response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul[@class="no-style"]/li[1]/text()').getall()[1].strip()
-        requied_experience = response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul/li[2]/text()').getall()[1].strip()
+        salary = \
+        response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul[@class="no-style"]/li[1]/text()').getall()[
+            1].strip()
+        requied_experience = response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul/li[2]/text()').getall()[
+            1].strip()
         degree = response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul/li[3]/text()').getall()[1].strip()
         # provincial = response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul/li[4]/a/text()').extract()[0].strip()
         categories = response.xpath('//div[@class="col-xs-4 offset20 push-right-20"]/ul/li[5]/a/text()').getall()
@@ -56,17 +68,32 @@ class TimViecNhanhSpider(scrapy.Spider):
 
         dealine_for_submit = response.xpath('//table/tbody/tr[4]/td[2]/b/text()').get().strip()
         job_description_arr = response.xpath('//table/tbody/tr[1]/td[2]/p/text()').getall()
-        job_description = ""
-        for x in job_description_arr:
-            job_description += x.strip() + "\n"
+        for i, x in enumerate(job_description_arr):
+            if len(x) < 2:
+                job_description_arr.remove(x)
+            else:
+                job_description_arr[i] = x.strip()
+        # job_description = ""
+        # for x in job_description_arr:
+        #     job_description += x.strip() + "\n"
         requirement_arr = response.xpath('//table/tbody/tr[2]/td[2]/p/text()').getall()
-        requirement = ""
-        for x in requirement_arr:
-            requirement += x.strip() + "\n"
-        benefits = ""
+        for i, x in enumerate(requirement_arr):
+            if len(x) < 2:
+                requirement_arr.remove(x)
+            else:
+                requirement_arr[i] = x.strip()
+        # requirement = ""
+        # for x in requirement_arr:
+        #     requirement += x.strip() + "\n"
         job_benefit = response.xpath('//table/tbody/tr[3]/td[2]/p/text()').getall()
-        for x in job_benefit:
-            benefits += x.strip() + '\n'
+        for i, x in enumerate(job_benefit):
+            if len(x) < 2:
+                job_benefit.remove(x)
+            else:
+                job_benefit[i] = x.strip()
+        # benefits = ""
+        # for x in job_benefit:
+        #     benefits += x.strip() + '\n'
 
         item = TimViecNhanhItem(
             job_title=job_title,
@@ -83,9 +110,11 @@ class TimViecNhanhSpider(scrapy.Spider):
             nature_of_work=nature_of_work,
             work_form=work_form,
             dealine_for_submit=dealine_for_submit,
-            job_description=job_description,
-            requirement=requirement,
-            benefits=benefits
+            job_description=job_description_arr,
+            requirement=requirement_arr,
+            benefits=job_benefit,
+            url=response.url,
+            source='timviecnhanh'
         )
         if item['job_title']:
             yield item

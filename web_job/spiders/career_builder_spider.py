@@ -9,7 +9,12 @@ class CareerBuilderSpider(scrapy.Spider):
     name = 'careerbuilder'
 
     custom_settings = {
-        'crawl_data.pipelines.JsonWriterPipeline': 300
+        # 'ITEM_PIPELINES': {
+        #     'web_job.pipelines.MappingPipeline': 100,
+        #     'web_job.pipelines.NormalizeAddressPipeline': 200,
+        #     'web_job.pipelines.NormalizeSalaryPipeline': 300,
+        # }
+
     }
 
     def start_requests(self):
@@ -62,9 +67,9 @@ class CareerBuilderSpider(scrapy.Spider):
                 end_date = field.xpath('text()').get().strip()
 
         benefits = response.xpath('//ul[@class="list-benefits"]/li/text()').getall()
-        job_description = response.xpath('//div[@class="content_fck"]').getall()[0]
+        job_description = response.xpath("//h4[@class='TitleJobNew'][contains(text(), 'Mô tả Công việc')]/following-sibling::div/p/text()").getall()
 
-        job_requirements = response.xpath('//div[@class="content_fck"]').getall()[1]
+        job_requirements = response.xpath("//h4[@class='TitleJobNew'][contains(text(), 'Yêu Cầu Công Việc')]/following-sibling::div/p/text()").getall()
 
         diploma = ''
         age = ''
@@ -123,7 +128,9 @@ class CareerBuilderSpider(scrapy.Spider):
             time_trail_work=time_trail_work,
             time_work=time_work,
             company_address=company_address,
-            company_size=company_size
+            company_size=company_size,
+            url=response.url,
+            source='careerbuilder'
         )
         yield item
 

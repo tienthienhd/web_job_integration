@@ -64,9 +64,19 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'web_job.pipelines.WebJobPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'web_job.pipelines.WebJobPipeline': 50,
+    'web_job.pipelines.DuplicatesPipeline': 100,
+    'web_job.pipelines.MappingPipeline': 200,
+    'web_job.pipelines.NormalizeAddressPipeline': 300,
+    'web_job.pipelines.NormalizeSalaryPipeline': 400,
+    'web_job.pipelines.DuplicatesFilterPipeline': 500,
+    # 'web_job.pipelines.JsonWriterPipeline': 600,
+    'web_job.pipelines.MongoPipeline': 700,
+}
+
+MONGO_URI = 'localhost:27017'
+MONGO_DATABASE = 'job_integration'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

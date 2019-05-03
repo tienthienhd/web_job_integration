@@ -14,7 +14,7 @@ experiment_required:experience_requirements
 diploma:
 company_name:company_name
 company_size:company_size
-company_address:
+company_address:company_address
 source:careerlink
 #timviecnhanh
 job_title:job_title

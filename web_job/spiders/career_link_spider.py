@@ -8,7 +8,12 @@ class CareerLinkSpider(scrapy.Spider):
     root_url = 'https://www.careerlink.vn'
 
     custom_settings = {
-        'crawl_data.pipelines.JsonWriterPipeline': 300
+        # 'ITEM_PIPELINES': {
+        #     'web_job.pipelines.MappingPipeline': 100,
+        #     'web_job.pipelines.NormalizeAddressPipeline': 200,
+        #     'web_job.pipelines.NormalizeSalaryPipeline': 300,
+        # }
+
     }
 
     def start_requests(self):
@@ -43,7 +48,8 @@ class CareerLinkSpider(scrapy.Spider):
         address_locality = response.xpath('//span[@itemprop="addressLocality"]/text()').get().strip()
         address_region = response.xpath('//span[@itemprop="addressRegion"]/text()').get().strip()
         address_country = response.xpath('//span[@itemprop="addressCountry"]/text()').get().strip()
-        address = street_address + address_locality + ', ' + address_region + ', ' + address_country
+        address = address_region
+        company_address = street_address + address_locality + ', ' + address_region + ', ' + address_country
         
         salary = response.xpath('//span[@itemprop="baseSalary"]/*[not(@class="hidden")]/text()').getall()
         for i,s in enumerate(salary):
@@ -51,8 +57,8 @@ class CareerLinkSpider(scrapy.Spider):
             if len(salary[i]) < 1:
                 salary.remove(salary[i])
 
-        job_description = response.xpath('//div[@itemprop="description"]').get()
-        skills = response.xpath('//div[@itemprop="skills"]').get()
+        job_description = response.xpath('//div[@itemprop="description"]/p/text()').getall()
+        skills = response.xpath('//div[@itemprop="skills"]/p/text()').getall()
 
         categories = ''
         position = ''
@@ -115,7 +121,10 @@ class CareerLinkSpider(scrapy.Spider):
             begin_date=begin_date,
             end_date=end_date,
             company_name=company_name,
-            company_size=company_size
+            company_size=company_size,
+            company_address=company_address,
+            url=response.url,
+            source='careerlink'
         )
 
         yield item

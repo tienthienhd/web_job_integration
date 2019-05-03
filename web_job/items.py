@@ -38,6 +38,8 @@ class CareerBuilderItem(scrapy.Item):
     job_type = scrapy.Field()
     time_trail_work = scrapy.Field()
     time_work = scrapy.Field()
+    url = scrapy.Field()
+    source = scrapy.Field()
 
 
 class CareerLinkItem(scrapy.Item):
@@ -56,6 +58,9 @@ class CareerLinkItem(scrapy.Item):
     end_date = scrapy.Field()
     company_name = scrapy.Field()
     company_size = scrapy.Field()
+    company_address = scrapy.Field()
+    url = scrapy.Field()
+    source = scrapy.Field()
 
 
 class TimViecNhanhItem(scrapy.Item):
@@ -79,3 +84,26 @@ class TimViecNhanhItem(scrapy.Item):
     categories = scrapy.Field()
     sex = scrapy.Field()
     benefits = scrapy.Field()
+    url = scrapy.Field()
+    source = scrapy.Field()
+
+
+class MediatedItem(scrapy.Item):
+    idx = scrapy.Field()
+    job_title = scrapy.Field()
+    address = scrapy.Field()
+    job_description = scrapy.Field()
+    categories = scrapy.Field()
+    update_date = scrapy.Field()
+    end_date = scrapy.Field()
+    salary = scrapy.Field() # xử lý khi cho vào mongodb
+    position = scrapy.Field()
+    age = scrapy.Field()
+    sex = scrapy.Field()
+    benefits = scrapy.Field()
+    experiment_required = scrapy.Field()
+    diploma = scrapy.Field()
+    company_name = scrapy.Field()
+    company_address = scrapy.Field()
+    company_size = scrapy.Field()
+    source = scrapy.Field()
