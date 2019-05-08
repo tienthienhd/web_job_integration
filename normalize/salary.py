@@ -54,7 +54,18 @@ def parse_salary(salary):
                 "unit": salary[0]
             }
         elif len(salary) == 2:
-            pass
+            if salary[-1] == 'USD':
+                return {
+                    "min": invert_format(salary[0]) * 23220,
+                    "max": 0,
+                    "unit": "VNĐ"
+                }
+            else:
+                return {
+                    "min": invert_format(salary[0]),
+                    "max": 0,
+                    "unit": "VNĐ"
+                }
         elif len(salary) == 3:
             return {
                 "min": invert_format(salary[0]),
@@ -69,10 +80,10 @@ def parse_salary(salary):
             }
     elif type(salary) is str:
         s = salary.split(' ')
-        # if s[0] == 'Trên':
-        #     s[0] = "{}-inf".format(s[1])
-        # elif s[0] == 'Dưới':
-        #     s[0] = "0-{}".format(s[1])
+        if s[0] == 'Trên':
+            s[0] = "{}-0".format(s[1])
+        elif s[0] == 'Dưới':
+            s[0] = "0-{}".format(s[1])
         t = s[0].split('-')
 
 
@@ -89,5 +100,4 @@ a = read_file('../raw_data/mapped_test.jl')
 
 
 for i in a:
-    if parse_salary(i) is None:
-        print(i)
+    print(parse_salary(i))

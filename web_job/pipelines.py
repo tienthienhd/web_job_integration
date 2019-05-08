@@ -229,7 +229,18 @@ class NormalizeSalaryPipeline(object):
                     "unit": salary[0]
                 }
             elif len(salary) == 2:
-                pass
+                if salary[-1] == 'USD':
+                    return {
+                        "min": NormalizeSalaryPipeline.invert_format(salary[0]) * 23220,
+                        "max": 0,
+                        "unit": "VNĐ"
+                    }
+                else:
+                    return {
+                        "min": NormalizeSalaryPipeline.invert_format(salary[0]),
+                        "max": 0,
+                        "unit": "VNĐ"
+                    }
             elif len(salary) == 3:
                 return {
                     "min": NormalizeSalaryPipeline.invert_format(salary[0]),
@@ -244,6 +255,10 @@ class NormalizeSalaryPipeline(object):
                 }
         elif type(salary) is str:
             s = salary.split(' ')
+            if s[0] == 'Trên':
+                s[0] = "{}-0".format(s[1])
+            elif s[0] == 'Dưới':
+                s[0] = "0-{}".format(s[1])
             t = s[0].split('-')
             if s[1] == 'triệu':
                 return {
@@ -319,24 +334,26 @@ class DuplicatesFilterPipeline(object):
 
             candidates = self.find_candidates(job_title_1)
             sim = False
+            sim_score = 0
             for i in candidates:
                 job_title_2 = i['job_title']
                 address_2 = i['company_address']
                 company_name_2 = i['company_name']
 
-                sim = 0.6 * self.jaro_winkler.similarity(job_title_1, job_title_2)
-                sim += 0.2 * self.jaro_winkler.similarity(address_1, address_2)
-                sim += 0.2 * self.jaro_winkler.similarity(company_name_1, company_name_2)
+                sim_score = 0.6 * self.jaro_winkler.similarity(job_title_1, job_title_2)
+                sim_score += 0.2 * self.jaro_winkler.similarity(address_1, address_2)
+                sim_score += 0.2 * self.jaro_winkler.similarity(company_name_1, company_name_2)
 
-                if sim >= 0.9:
-                    print(sim)
+                if sim_score >= 0.9:
+                    print(sim_score)
                     print(job_title_1 + '|||' + str(address_1) + '|||' + company_name_1 + '|||' + item['source'])
                     print(job_title_2 + '|||' + str(address_2) + '|||' + company_name_2 + '|||' + i['source'])
                     print("=========================================================")
                     sim = True
-                    raise DropItem("Duplicate item found: %s" % item)
+                    raise DropItem("Duplicate item found with sim score {}: {}".format(sim_score, item))
             if len(candidates) == 0:
-                raise DropItem("Duplicate item found: %s" % item)
+                self.filted.append(item)
+                return item
 
             if not sim:
                 self.filted.append(item)

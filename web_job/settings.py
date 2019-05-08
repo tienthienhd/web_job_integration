@@ -78,6 +78,8 @@ ITEM_PIPELINES = {
 MONGO_URI = 'localhost:27017'
 MONGO_DATABASE = 'job_integration'
 
+CLOSESPIDER_TIMEOUT = 1000
+
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
