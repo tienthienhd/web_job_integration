@@ -231,7 +231,7 @@ class NormalizeSalaryPipeline(object):
             elif len(salary) == 2:
                 if salary[-1] == 'USD':
                     return {
-                        "min": NormalizeSalaryPipeline.invert_format(salary[0]) * 23220,
+                        "min": NormalizeSalaryPipeline.invert_format(salary[0]) * 23360,
                         "max": 0,
                         "unit": "VNĐ"
                     }

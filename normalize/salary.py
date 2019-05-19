@@ -1,5 +1,5 @@
 import json
-
+import urllib3
 
 def read_file(file):
     salary = []
@@ -96,8 +96,26 @@ def parse_salary(salary):
 
 
 
-a = read_file('../raw_data/mapped_test.jl')
+def get_rate():
+    http = urllib3.PoolManager()
+    url_query = "http://www.dongabank.com.vn/exchange/export"
+    r = http.request('GET', url_query, headers={
+        "User-Agent" : "Mozilla/5.0 ( compatible ) ",
+        "Accept": "*/*",
+    })
+    response = r.data.decode('utf-8')
+    response = response.replace("\\", "")[1:-1]
+    response = json.loads(response, encoding='utf-8')
+    print(response)
+    items = response['items']
 
+    usd_rate = items[12]['muack']
+    print(usd_rate)
+    return usd_rate
+get_rate()
 
-for i in a:
-    print(parse_salary(i))
+# a = read_file('../raw_data/mapped_test.jl')
+#
+#
+# for i in a:
+#     print(parse_salary(i))
